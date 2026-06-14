@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DominionCore Admin Dashboard</title>
+    <title>DominionCore Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -11,304 +11,358 @@
 <body>
     <div class="container">
         <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <nav class="sidebar">
             <div class="logo">
-                <h1>🔮 DominionCore</h1>
-                <p>Admin Dashboard</p>
+                <h1>⚔️ DominionCore</h1>
             </div>
-            <nav class="nav-menu">
-                <a href="#dashboard" class="nav-item active" data-page="dashboard">
-                    <span class="icon">📊</span> Dashboard
-                </a>
-                <a href="#players" class="nav-item" data-page="players">
-                    <span class="icon">👥</span> Players
-                </a>
-                <a href="#factions" class="nav-item" data-page="factions">
-                    <span class="icon">🏰</span> Factions
-                </a>
-                <a href="#religions" class="nav-item" data-page="religions">
-                    <span class="icon">✨</span> Religions
-                </a>
-                <a href="#bloodlines" class="nav-item" data-page="bloodlines">
-                    <span class="icon">🧬</span> Bloodlines
-                </a>
-                <a href="#dominions" class="nav-item" data-page="dominions">
-                    <span class="icon">💎</span> Dominions
-                </a>
-                <a href="#events" class="nav-item" data-page="events">
-                    <span class="icon">⚡</span> Events
-                </a>
-                <a href="#items" class="nav-item" data-page="items">
-                    <span class="icon">🗡️</span> Items
-                </a>
-                <a href="#dungeons" class="nav-item" data-page="dungeons">
-                    <span class="icon">🏛️</span> Dungeons
-                </a>
-                <a href="#leaderboard" class="nav-item" data-page="leaderboard">
-                    <span class="icon">🏆</span> Leaderboard
-                </a>
-                <a href="#settings" class="nav-item" data-page="settings">
-                    <span class="icon">⚙️</span> Settings
-                </a>
-            </nav>
-        </aside>
+            <ul class="menu">
+                <li><a href="#dashboard" class="menu-item active" data-page="dashboard">📊 Dashboard</a></li>
+                <li><a href="#players" class="menu-item" data-page="players">👥 Players</a></li>
+                <li><a href="#factions" class="menu-item" data-page="factions">🏰 Factions</a></li>
+                <li><a href="#religions" class="menu-item" data-page="religions">⛪ Religions</a></li>
+                <li><a href="#content" class="menu-item" data-page="content">✨ Content</a></li>
+                <li><a href="#events" class="menu-item" data-page="events">🌙 World Events</a></li>
+                <li><a href="#dimensions" class="menu-item" data-page="dimensions">🌍 Dimensions</a></li>
+                <li><a href="#settings" class="menu-item" data-page="settings">⚙️ Settings</a></li>
+            </ul>
+        </nav>
 
         <!-- Main Content -->
-        <main class="main-content">
+        <div class="main-content">
             <!-- Header -->
             <header class="header">
                 <div class="header-left">
-                    <h1 id="page-title">Dashboard</h1>
+                    <h2 id="page-title">Dashboard</h2>
                 </div>
                 <div class="header-right">
-                    <div class="server-status">
-                        <span class="status-dot online"></span>
-                        <span id="server-status-text">Server Online</span>
+                    <div class="search-bar">
+                        <input type="text" placeholder="Search players, factions..." id="search-input">
                     </div>
                     <div class="user-profile">
-                        <img src="https://crafatar.com/avatars/admin?size=32" alt="Admin" class="avatar">
-                        <span id="admin-name">Admin</span>
+                        <img src="https://via.placeholder.com/40" alt="Admin" class="avatar">
+                        <span id="username">Admin</span>
                     </div>
                 </div>
             </header>
 
-            <!-- Dashboard Page -->
-            <section id="dashboard-page" class="page active">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>Online Players</h3>
-                        <p class="stat-value" id="online-players">0</p>
-                        <p class="stat-subtitle">Currently playing</p>
+            <!-- Content Area -->
+            <div class="content">
+                <!-- Dashboard Page -->
+                <div id="page-dashboard" class="page active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <div class="stat-label">Online Players</div>
+                                <div class="stat-value" id="online-players">0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏰</div>
+                            <div class="stat-info">
+                                <div class="stat-label">Total Factions</div>
+                                <div class="stat-value" id="total-factions">0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⛪</div>
+                            <div class="stat-info">
+                                <div class="stat-label">Active Religions</div>
+                                <div class="stat-value" id="total-religions">0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">👑</div>
+                            <div class="stat-info">
+                                <div class="stat-label">Gods</div>
+                                <div class="stat-value" id="total-gods">0</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Total Players</h3>
-                        <p class="stat-value" id="total-players">0</p>
-                        <p class="stat-subtitle">All time</p>
+
+                    <!-- Charts -->
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h3>Player Progression</h3>
+                            <canvas id="progression-chart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Dominions Distribution</h3>
+                            <canvas id="dominions-chart"></canvas>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Active Factions</h3>
-                        <p class="stat-value" id="active-factions">0</p>
-                        <p class="stat-subtitle">With members</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Active Religions</h3>
-                        <p class="stat-value" id="active-religions">0</p>
-                        <p class="stat-subtitle">With followers</p>
+
+                    <!-- Recent Activity -->
+                    <div class="activity-section">
+                        <h3>Recent Activity</h3>
+                        <div class="activity-list" id="activity-list">
+                            <!-- Populated by JS -->
+                        </div>
                     </div>
                 </div>
 
-                <div class="charts-container">
-                    <div class="chart-box">
-                        <h3>Player Growth</h3>
-                        <canvas id="playerGrowthChart"></canvas>
+                <!-- Players Page -->
+                <div id="page-players" class="page">
+                    <div class="page-header">
+                        <h2>Player Management</h2>
+                        <div class="page-controls">
+                            <input type="text" placeholder="Search players..." id="player-search">
+                            <button class="btn btn-primary" onclick="openPlayerModal()">+ New Player</button>
+                        </div>
                     </div>
-                    <div class="chart-box">
-                        <h3>Bloodline Distribution</h3>
-                        <canvas id="bloodlineChart"></canvas>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Player Name</th>
+                                    <th>Bloodline</th>
+                                    <th>Dominion</th>
+                                    <th>Level</th>
+                                    <th>Faction</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="players-table-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <div class="recent-events">
-                    <h3>Recent Activity</h3>
-                    <div id="activity-list" class="activity-list">
+                <!-- Factions Page -->
+                <div id="page-factions" class="page">
+                    <div class="page-header">
+                        <h2>Faction Management</h2>
+                        <button class="btn btn-primary" onclick="openFactionModal()">+ Create Faction</button>
+                    </div>
+
+                    <div class="factions-grid" id="factions-grid">
                         <!-- Populated by JS -->
                     </div>
                 </div>
-            </section>
 
-            <!-- Players Page -->
-            <section id="players-page" class="page">
-                <div class="page-header">
-                    <h2>Player Management</h2>
-                    <input type="text" id="player-search" placeholder="Search players..." class="search-box">
-                </div>
-                <div id="players-list" class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Level</th>
-                                <th>Bloodline</th>
-                                <th>Dominion</th>
-                                <th>Religion</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="players-tbody">
-                            <!-- Populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Factions Page -->
-            <section id="factions-page" class="page">
-                <div class="page-header">
-                    <h2>Faction Management</h2>
-                    <button class="btn btn-primary" id="create-faction-btn">+ Create Faction</button>
-                </div>
-                <div id="factions-grid" class="factions-grid">
-                    <!-- Populated by JS -->
-                </div>
-            </section>
-
-            <!-- Religions Page -->
-            <section id="religions-page" class="page">
-                <div class="page-header">
-                    <h2>Religion Management</h2>
-                    <button class="btn btn-primary" id="create-religion-btn">+ Create Religion</button>
-                </div>
-                <div id="religions-grid" class="religions-grid">
-                    <!-- Populated by JS -->
-                </div>
-            </section>
-
-            <!-- Bloodlines Page -->
-            <section id="bloodlines-page" class="page">
-                <div class="page-header">
-                    <h2>Bloodline Editor</h2>
-                    <button class="btn btn-primary" id="create-bloodline-btn">+ Create Bloodline</button>
-                </div>
-                <div id="bloodlines-grid" class="bloodlines-grid">
-                    <!-- Populated by JS -->
-                </div>
-            </section>
-
-            <!-- Dominions Page -->
-            <section id="dominions-page" class="page">
-                <div class="page-header">
-                    <h2>Dominion Editor</h2>
-                    <button class="btn btn-primary" id="create-dominion-btn">+ Create Dominion</button>
-                </div>
-                <div id="dominions-grid" class="dominions-grid">
-                    <!-- Populated by JS -->
-                </div>
-            </section>
-
-            <!-- Events Page -->
-            <section id="events-page" class="page">
-                <div class="page-header">
-                    <h2>World Events</h2>
-                </div>
-                <div class="events-container">
-                    <div class="event-card">
-                        <h3>🔥 Demon Invasion</h3>
-                        <p>Spawn waves of demons across the world</p>
-                        <button class="btn btn-warning" onclick="triggerEvent('demon_invasion')">Trigger Now</button>
+                <!-- Religions Page -->
+                <div id="page-religions" class="page">
+                    <div class="page-header">
+                        <h2>Religion Management</h2>
+                        <button class="btn btn-primary" onclick="openReligionModal()">+ Create Religion</button>
                     </div>
-                    <div class="event-card">
-                        <h3>⚔️ Titan Awakening</h3>
-                        <p>A massive titan emerges</p>
-                        <button class="btn btn-warning" onclick="triggerEvent('titan_awakening')">Trigger Now</button>
-                    </div>
-                    <div class="event-card">
-                        <h3>⚡ Divine War</h3>
-                        <p>Gods and demons clash</p>
-                        <button class="btn btn-warning" onclick="triggerEvent('divine_war')">Trigger Now</button>
-                    </div>
-                    <div class="event-card">
-                        <h3>🌙 Blood Moon</h3>
-                        <p>Enhanced demon activity</p>
-                        <button class="btn btn-warning" onclick="triggerEvent('blood_moon')">Trigger Now</button>
-                    </div>
-                    <div class="event-card">
-                        <h3>💥 Reality Collapse</h3>
-                        <p>Reality becomes unstable</p>
-                        <button class="btn btn-warning" onclick="triggerEvent('reality_collapse')">Trigger Now</button>
+
+                    <div class="religions-grid" id="religions-grid">
+                        <!-- Populated by JS -->
                     </div>
                 </div>
-            </section>
 
-            <!-- Items Page -->
-            <section id="items-page" class="page">
-                <div class="page-header">
-                    <h2>Legendary Items</h2>
-                    <button class="btn btn-primary" id="create-item-btn">+ Create Item</button>
-                </div>
-                <div id="items-grid" class="items-grid">
-                    <!-- Populated by JS -->
-                </div>
-            </section>
+                <!-- Content Creator Page -->
+                <div id="page-content" class="page">
+                    <div class="page-header">
+                        <h2>Create Custom Content</h2>
+                    </div>
 
-            <!-- Dungeons Page -->
-            <section id="dungeons-page" class="page">
-                <div class="page-header">
-                    <h2>Dungeons & Raids</h2>
-                    <button class="btn btn-primary" id="create-dungeon-btn">+ Create Dungeon</button>
-                </div>
-                <div id="dungeons-grid" class="dungeons-grid">
-                    <!-- Populated by JS -->
-                </div>
-            </section>
+                    <div class="content-creator">
+                        <div class="form-section">
+                            <h3>Create Bloodline</h3>
+                            <form id="bloodline-form">
+                                <input type="text" placeholder="Bloodline Name" required>
+                                <select required>
+                                    <option>Select Type</option>
+                                    <option>Creation</option>
+                                    <option>Fire</option>
+                                    <option>Ice</option>
+                                    <option>Dragon</option>
+                                    <option>Divine</option>
+                                    <option>Demonic</option>
+                                </select>
+                                <textarea placeholder="Description"></textarea>
+                                <button type="submit" class="btn btn-primary">Create Bloodline</button>
+                            </form>
+                        </div>
 
-            <!-- Leaderboard Page -->
-            <section id="leaderboard-page" class="page">
-                <div class="page-header">
-                    <h2>Leaderboards</h2>
-                    <div class="leaderboard-filters">
-                        <button class="filter-btn active" onclick="showLeaderboard('level')">Level</button>
-                        <button class="filter-btn" onclick="showLeaderboard('faith')">Faith</button>
-                        <button class="filter-btn" onclick="showLeaderboard('achievements')">Achievements</button>
-                        <button class="filter-btn" onclick="showLeaderboard('wealth')">Wealth</button>
+                        <div class="form-section">
+                            <h3>Create Dominion</h3>
+                            <form id="dominion-form">
+                                <input type="text" placeholder="Dominion Name" required>
+                                <select required>
+                                    <option>Select Type</option>
+                                    <option>Fire</option>
+                                    <option>Water</option>
+                                    <option>Time</option>
+                                    <option>Divine</option>
+                                    <option>Beast</option>
+                                </select>
+                                <input type="number" placeholder="Power Level" min="1" max="100">
+                                <button type="submit" class="btn btn-primary">Create Dominion</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-                <div id="leaderboard-content" class="leaderboard-container">
-                    <!-- Populated by JS -->
-                </div>
-            </section>
 
-            <!-- Settings Page -->
-            <section id="settings-page" class="page">
-                <div class="page-header">
-                    <h2>Settings</h2>
+                <!-- World Events Page -->
+                <div id="page-events" class="page">
+                    <div class="page-header">
+                        <h2>World Events Management</h2>
+                    </div>
+
+                    <div class="events-grid">
+                        <div class="event-card" onclick="triggerEvent('demon_invasion')">
+                            <div class="event-icon">🔴</div>
+                            <h3>Demon Invasion</h3>
+                            <p>Spawn waves of demons</p>
+                            <button class="btn btn-danger">Trigger Event</button>
+                        </div>
+                        <div class="event-card" onclick="triggerEvent('titan_awakening')">
+                            <div class="event-icon">⚡</div>
+                            <h3>Titan Awakening</h3>
+                            <p>A titan emerges</p>
+                            <button class="btn btn-warning">Trigger Event</button>
+                        </div>
+                        <div class="event-card" onclick="triggerEvent('divine_war')">
+                            <div class="event-icon">⚔️</div>
+                            <h3>Divine War</h3>
+                            <p>Gods vs Demons</p>
+                            <button class="btn btn-info">Trigger Event</button>
+                        </div>
+                        <div class="event-card" onclick="triggerEvent('blood_moon')">
+                            <div class="event-icon">🌙</div>
+                            <h3>Blood Moon</h3>
+                            <p>Enhanced demon activity</p>
+                            <button class="btn btn-danger">Trigger Event</button>
+                        </div>
+                        <div class="event-card" onclick="triggerEvent('reality_collapse')">
+                            <div class="event-icon">💫</div>
+                            <h3>Reality Collapse</h3>
+                            <p>Reality becomes unstable</p>
+                            <button class="btn btn-danger">Trigger Event</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="settings-container">
-                    <div class="settings-section">
-                        <h3>Server Configuration</h3>
-                        <div class="setting-item">
+
+                <!-- Dimensions Page -->
+                <div id="page-dimensions" class="page">
+                    <div class="page-header">
+                        <h2>Dimensions Management</h2>
+                    </div>
+
+                    <div class="dimensions-grid">
+                        <div class="dimension-card">
+                            <h3>Divine Realm</h3>
+                            <p>⭐ Gods and ascended beings</p>
+                            <button class="btn btn-primary">Edit</button>
+                        </div>
+                        <div class="dimension-card">
+                            <h3>Hell Circle 1</h3>
+                            <p>🔥 Entry level demons</p>
+                            <button class="btn btn-primary">Edit</button>
+                        </div>
+                        <div class="dimension-card">
+                            <h3>Tartarus</h3>
+                            <p>⚔️ Warden territory</p>
+                            <button class="btn btn-primary">Edit</button>
+                        </div>
+                        <div class="dimension-card">
+                            <h3>Chaos Dimension</h3>
+                            <p>💫 Reality unstable</p>
+                            <button class="btn btn-primary">Edit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div id="page-settings" class="page">
+                    <div class="page-header">
+                        <h2>Server Settings</h2>
+                    </div>
+
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label>Server Name</label>
+                            <input type="text" placeholder="DominionCore Server" id="server-name">
+                        </div>
+                        <div class="form-group">
                             <label>Max Players</label>
-                            <input type="number" id="max-players" value="100" class="input-field">
+                            <input type="number" placeholder="100" id="max-players">
                         </div>
-                        <div class="setting-item">
-                            <label>Enable PvP</label>
-                            <input type="checkbox" id="enable-pvp" checked class="checkbox-field">
+                        <div class="form-group">
+                            <label>Enable Web Sync</label>
+                            <input type="checkbox" id="enable-sync" checked>
                         </div>
-                        <div class="setting-item">
-                            <label>Enable World Events</label>
-                            <input type="checkbox" id="enable-events" checked class="checkbox-field">
+                        <div class="form-group">
+                            <label>Sync Interval (seconds)</label>
+                            <input type="number" placeholder="300" id="sync-interval">
                         </div>
-                    </div>
-                    <div class="settings-section">
-                        <h3>Difficulty Settings</h3>
-                        <div class="setting-item">
-                            <label>Difficulty Level</label>
-                            <select id="difficulty" class="select-field">
-                                <option>Easy</option>
-                                <option>Normal</option>
-                                <option selected>Hard</option>
-                                <option>Impossible</option>
+                        <div class="form-group">
+                            <label>Event Frequency</label>
+                            <select id="event-frequency">
+                                <option>Rare</option>
+                                <option selected>Normal</option>
+                                <option>Frequent</option>
                             </select>
                         </div>
+                        <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
                     </div>
-                    <button class="btn btn-success" onclick="saveSettings()">Save Settings</button>
                 </div>
-            </section>
-        </main>
+            </div>
+        </div>
     </div>
 
-    <!-- Modal for creating/editing items -->
-    <div id="modal" class="modal">
+    <!-- Modal for Player Details -->
+    <div id="player-modal" class="modal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <h2 id="modal-title">Create Item</h2>
-            <form id="modal-form" onsubmit="submitForm(event)">
-                <!-- Dynamically populated -->
+            <span class="close" onclick="closeModal('player-modal')">&times;</span>
+            <h2>Player Details</h2>
+            <form id="player-form">
+                <input type="text" placeholder="Player Name" id="modal-player-name" required>
+                <select id="modal-bloodline">
+                    <option>Select Bloodline</option>
+                    <option>Genesis</option>
+                    <option>Dragon</option>
+                    <option>Phoenix</option>
+                    <option>Null</option>
+                </select>
+                <select id="modal-dominion">
+                    <option>Select Dominion</option>
+                    <option>Fire</option>
+                    <option>Water</option>
+                    <option>Divine</option>
+                </select>
+                <input type="number" placeholder="Level" id="modal-level" min="1" max="100">
+                <button type="submit" class="btn btn-primary">Save Player</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Faction Details -->
+    <div id="faction-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('faction-modal')">&times;</span>
+            <h2>Faction Details</h2>
+            <form id="faction-form">
+                <input type="text" placeholder="Faction Name" id="modal-faction-name" required>
+                <input type="text" placeholder="King" id="modal-faction-king" required>
+                <input type="number" placeholder="Treasury" id="modal-treasury" min="0">
+                <textarea placeholder="Description"></textarea>
+                <button type="submit" class="btn btn-primary">Create Faction</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Religion Details -->
+    <div id="religion-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('religion-modal')">&times;</span>
+            <h2>Religion Details</h2>
+            <form id="religion-form">
+                <input type="text" placeholder="Religion Name" id="modal-religion-name" required>
+                <input type="text" placeholder="Founder" id="modal-religion-founder" required>
+                <input type="text" placeholder="Symbol" id="modal-religion-symbol">
+                <textarea placeholder="Description"></textarea>
+                <button type="submit" class="btn btn-primary">Create Religion</button>
             </form>
         </div>
     </div>
 
     <script src="js/dashboard.js"></script>
-    <script src="js/api.js"></script>
 </body>
 </html>

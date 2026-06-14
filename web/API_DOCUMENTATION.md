@@ -6,619 +6,541 @@ https://dominion-core.godkiller1233.dev/api
 ```
 
 ## Authentication
-All endpoints require a Bearer token in the Authorization header:
+All endpoints (except `/auth/login` and `/auth/register`) require an Authorization header:
 ```
-Authorization: Bearer YOUR_SERVER_TOKEN
+Authorization: Bearer {token}
 ```
 
 ---
 
-## Players
+## Authentication Endpoints
 
-### Get All Players
-```http
-GET /players
+### POST /auth/login
+Authenticate a server and receive token.
+
+**Request:**
+```json
+{
+  "username": "admin",
+  "password": "password123"
+}
 ```
 
 **Response:**
 ```json
-[
-  {
-    "uuid": "550e8400-e29b-41d4-a716-446655440000",
-    "name": "PlayerName",
-    "level": 5,
-    "bloodline": "genesis",
-    "dominion": "fire",
-    "religion": null,
-    "online": true,
-    "lastSeen": "2026-06-14T20:45:00Z"
-  }
-]
-```
-
-### Get Player by UUID
-```http
-GET /players/{uuid}
-```
-
-### Update Player Data
-```http
-PUT /players/{uuid}
-```
-
-**Request Body:**
-```json
 {
-  "level": 10,
-  "bloodline": "dragon",
-  "divineEnergy": 75.5,
-  "faith": 200
+  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "expiresIn": 86400
 }
 ```
 
-### Ban Player
-```http
-POST /players/{uuid}/ban
-```
-
-**Request Body:**
-```json
-{
-  "reason": "Hacking detected",
-  "duration": 86400
-}
-```
-
-### Kick Player
-```http
-POST /players/{uuid}/kick
-```
-
-**Request Body:**
-```json
-{
-  "message": "Server maintenance"
-}
-```
-
----
-
-## Factions
-
-### Get All Factions
-```http
-GET /factions
-```
-
-### Get Faction by ID
-```http
-GET /factions/{factionId}
-```
-
-### Create Faction
-```http
-POST /factions
-```
-
-**Request Body:**
-```json
-{
-  "name": "Dragon Slayers",
-  "king": "550e8400-e29b-41d4-a716-446655440000",
-  "symbol": "🐉",
-  "treasury": 1000
-}
-```
-
-### Update Faction
-```http
-PUT /factions/{factionId}
-```
-
-**Request Body:**
-```json
-{
-  "name": "New Name",
-  "treasury": 2000
-}
-```
-
-### Delete Faction
-```http
-DELETE /factions/{factionId}
-```
-
-### Add Faction Member
-```http
-POST /factions/{factionId}/members
-```
-
-**Request Body:**
-```json
-{
-  "uuid": "550e8400-e29b-41d4-a716-446655440000",
-  "rank": "member"
-}
-```
-
-### Remove Faction Member
-```http
-DELETE /factions/{factionId}/members/{uuid}
-```
-
----
-
-## Religions
-
-### Get All Religions
-```http
-GET /religions
-```
-
-### Get Religion by ID
-```http
-GET /religions/{religionId}
-```
-
-### Create Religion
-```http
-POST /religions
-```
-
-**Request Body:**
-```json
-{
-  "name": "Church of the Dragon",
-  "founder": "550e8400-e29b-41d4-a716-446655440000",
-  "symbol": "🐉",
-  "beliefs": ["power", "strength", "dominion"]
-}
-```
-
-### Update Religion
-```http
-PUT /religions/{religionId}
-```
-
-### Delete Religion
-```http
-DELETE /religions/{religionId}
-```
-
-### Add Follower
-```http
-POST /religions/{religionId}/followers
-```
-
-**Request Body:**
-```json
-{
-  "uuid": "550e8400-e29b-41d4-a716-446655440000"
-}
-```
-
----
-
-## Bloodlines
-
-### Get All Bloodlines
-```http
-GET /bloodlines
-```
-
-### Create Bloodline
-```http
-POST /bloodlines
-```
-
-**Request Body:**
-```json
-{
-  "name": "Phoenix",
-  "type": "fire",
-  "passive": "flame_aura",
-  "active": ["rebirth", "fire_blast"],
-  "evolution": "ImmortalPhoenix",
-  "weakness": "water"
-}
-```
-
-### Update Bloodline
-```http
-PUT /bloodlines/{bloodlineId}
-```
-
-### Delete Bloodline
-```http
-DELETE /bloodlines/{bloodlineId}
-```
-
----
-
-## Dominions
-
-### Get All Dominions
-```http
-GET /dominions
-```
-
-### Create Dominion
-```http
-POST /dominions
-```
-
-**Request Body:**
-```json
-{
-  "name": "Inferno",
-  "type": "fire",
-  "abilities": ["massive_fireball", "lava_walk", "fire_immunity"],
-  "power": 8.5,
-  "cooldown": 30
-}
-```
-
-### Update Dominion
-```http
-PUT /dominions/{dominionId}
-```
-
-### Delete Dominion
-```http
-DELETE /dominions/{dominionId}
-```
-
----
-
-## Items
-
-### Get All Items
-```http
-GET /items
-```
-
-### Create Item
-```http
-POST /items
-```
-
-**Request Body:**
-```json
-{
-  "name": "Crown of Creation",
-  "type": "helmet",
-  "rarity": "mythic",
-  "damage": 15,
-  "attributes": {
-    "strength": 5,
-    "intelligence": 3
-  },
-  "specialAbilities": ["creation_aura", "world_shaping"]
-}
-```
-
-### Update Item
-```http
-PUT /items/{itemId}
-```
-
-### Delete Item
-```http
-DELETE /items/{itemId}
-```
-
-### Give Item to Player
-```http
-POST /items/{itemId}/give/{uuid}
-```
-
----
-
-## Dungeons
-
-### Get All Dungeons
-```http
-GET /dungeons
-```
-
-### Create Dungeon
-```http
-POST /dungeons
-```
-
-**Request Body:**
-```json
-{
-  "name": "Tower of Creation",
-  "difficulty": "hard",
-  "minLevel": 20,
-  "maxPlayers": 4,
-  "bosses": ["genesis_guardian", "reality_warden"],
-  "rewards": {
-    "xp": 5000,
-    "gold": 10000,
-    "loot": ["crown_of_creation"]
-  },
-  "resetTime": "daily"
-}
-```
-
-### Update Dungeon
-```http
-PUT /dungeons/{dungeonId}
-```
-
-### Delete Dungeon
-```http
-DELETE /dungeons/{dungeonId}
-```
-
-### Start Dungeon Run
-```http
-POST /dungeons/{dungeonId}/start
-```
-
-**Request Body:**
-```json
-{
-  "players": ["uuid1", "uuid2", "uuid3"]
-}
-```
-
----
-
-## World Events
-
-### Trigger Event
-```http
-POST /events/trigger/{eventType}
-```
-
-**Event Types:**
-- `demon_invasion`
-- `titan_awakening`
-- `divine_war`
-- `blood_moon`
-- `reality_collapse`
+### POST /auth/verify
+Verify if a token is valid.
 
 **Response:**
 ```json
 {
-  "success": true,
-  "event": "demon_invasion",
-  "duration": 1200,
-  "message": "Event started!"
+  "valid": true,
+  "username": "admin",
+  "expiresAt": "2026-06-15T12:00:00Z"
 }
 ```
 
-### Get Current Event
-```http
-GET /events/current
-```
+### POST /auth/register
+Register a new server.
 
-### Cancel Current Event
-```http
-POST /events/cancel
+**Request:**
+```json
+{
+  "username": "myserver",
+  "password": "secure_password",
+  "serverName": "DominionCore PvP"
+}
 ```
 
 ---
 
-## Server Stats
+## Dashboard Endpoints
 
-### Get Server Statistics
-```http
-GET /stats
-```
+### GET /dashboard
+Fetch dashboard statistics and recent activity.
 
 **Response:**
 ```json
 {
   "onlinePlayers": 42,
   "totalPlayers": 256,
-  "activeFactions": 8,
-  "activeReligions": 5,
-  "totalGold": 500000,
-  "uptime": 86400,
-  "tps": 19.8,
-  "playerGrowthData": [
-    { "date": "2026-06-01", "count": 100 },
-    { "date": "2026-06-02", "count": 120 }
-  ],
-  "bloodlineDistribution": {
-    "genesis": 45,
-    "dragon": 38,
-    "phoenix": 32
-  }
+  "totalFactions": 8,
+  "totalReligions": 5,
+  "totalGods": 3,
+  "progressionData": {
+    "labels": ["Mortal", "Bloodline Holder", "Dominion Wielder", "God"],
+    "values": [120, 80, 50, 3]
+  },
+  "dominionsData": {
+    "labels": ["Fire", "Water", "Divine", "Beast"],
+    "values": [45, 35, 40, 30]
+  },
+  "recentActivity": [
+    {
+      "player": "Player123",
+      "action": "became a God",
+      "timestamp": "2026-06-14T20:30:00Z"
+    }
+  ]
 }
 ```
 
 ---
 
-## Leaderboards
+## Player Endpoints
 
-### Get Leaderboard by Type
-```http
-GET /leaderboard/{type}
-```
+### GET /players
+Fetch all players.
 
-**Types:**
-- `level`
-- `faith`
-- `achievements`
-- `wealth`
-- `killstreak`
+**Query Parameters:**
+- `limit`: 10
+- `offset`: 0
+- `search`: (optional) search term
+- `sort`: `name` | `level` | `faction`
 
 **Response:**
 ```json
-[
-  {
-    "rank": 1,
-    "uuid": "550e8400-e29b-41d4-a716-446655440000",
-    "name": "PlayerName",
-    "score": 1000
+{
+  "players": [
+    {
+      "uuid": "550e8400-e29b-41d4-a716-446655440000",
+      "name": "Player123",
+      "bloodline": "Genesis",
+      "dominion": "Fire",
+      "level": 5,
+      "faction": "Dragons",
+      "status": "online",
+      "lastSeen": "2026-06-14T20:45:00Z"
+    }
+  ],
+  "total": 256,
+  "page": 1,
+  "pageSize": 10
+}
+```
+
+### GET /players/{uuid}
+Fetch a specific player's details.
+
+**Response:**
+```json
+{
+  "uuid": "550e8400-e29b-41d4-a716-446655440000",
+  "name": "Player123",
+  "bloodline": "Genesis",
+  "bloodlineLevel": 5,
+  "dominion": "Fire",
+  "dominionPower": 8.5,
+  "religion": "PyreWorship",
+  "faith": 150,
+  "faction": "Dragons",
+  "factionRank": "Elite",
+  "divineEnergy": 75,
+  "devilStatus": "mortal",
+  "souls": 0,
+  "isGod": false,
+  "isTitan": false,
+  "achievements": ["first_blood", "evolved", "power_wielder"],
+  "joinedAt": "2026-01-15T10:00:00Z"
+}
+```
+
+### POST /players
+Create a new player.
+
+**Request:**
+```json
+{
+  "name": "NewPlayer",
+  "bloodline": "Genesis",
+  "dominion": "Fire",
+  "level": 1
+}
+```
+
+### PUT /players/{uuid}
+Update player data.
+
+**Request:**
+```json
+{
+  "bloodline": "Dragon",
+  "dominion": "Water",
+  "level": 10,
+  "divineEnergy": 80
+}
+```
+
+### DELETE /players/{uuid}
+Delete a player (admin only).
+
+---
+
+## Faction Endpoints
+
+### GET /factions
+Fetch all factions.
+
+**Response:**
+```json
+{
+  "factions": [
+    {
+      "id": "faction_001",
+      "name": "Dragons",
+      "king": "Player123",
+      "memberCount": 25,
+      "treasury": 50000,
+      "level": 3,
+      "allies": ["faction_002"],
+      "enemies": [],
+      "claimedChunks": 150,
+      "mainCapital": "Dragon's Lair",
+      "cities": ["Dragon's Lair", "Fire Peak"]
+    }
+  ]
+}
+```
+
+### GET /factions/{id}
+Fetch a specific faction.
+
+### POST /factions
+Create a new faction.
+
+**Request:**
+```json
+{
+  "name": "Dragons",
+  "king": "550e8400-e29b-41d4-a716-446655440000",
+  "treasury": 1000
+}
+```
+
+### PUT /factions/{id}
+Update faction data.
+
+**Request:**
+```json
+{
+  "treasury": 50000,
+  "mainCapital": "Dragon's Lair"
+}
+```
+
+### POST /factions/{id}/members/{playerUuid}
+Add member to faction.
+
+### DELETE /factions/{id}/members/{playerUuid}
+Remove member from faction.
+
+### POST /factions/{id}/allies/{targetFactionId}
+Add faction ally.
+
+### POST /factions/{id}/enemies/{targetFactionId}
+Add faction enemy (declare war).
+
+---
+
+## Religion Endpoints
+
+### GET /religions
+Fetch all religions.
+
+**Response:**
+```json
+{
+  "religions": [
+    {
+      "id": "religion_001",
+      "name": "PyreWorship",
+      "founder": "Player123",
+      "symbol": "🔥",
+      "beliefs": ["rebirth", "transformation"],
+      "followerCount": 15,
+      "faith": 250,
+      "level": 2,
+      "currentProphet": "Player456",
+      "saints": ["Player456", "Player789"]
+    }
+  ]
+}
+```
+
+### GET /religions/{id}
+Fetch a specific religion.
+
+### POST /religions
+Create a new religion.
+
+**Request:**
+```json
+{
+  "name": "PyreWorship",
+  "founder": "550e8400-e29b-41d4-a716-446655440000",
+  "symbol": "🔥",
+  "beliefs": ["rebirth", "transformation"]
+}
+```
+
+### PUT /religions/{id}
+Update religion data.
+
+### POST /religions/{id}/followers/{playerUuid}
+Add follower to religion.
+
+### POST /religions/{id}/saints/{playerUuid}
+Make a player a saint.
+
+### POST /religions/{id}/prophet/{playerUuid}
+Set religion prophet.
+
+---
+
+## Content Endpoints
+
+### POST /content/bloodlines
+Create a custom bloodline.
+
+**Request:**
+```json
+{
+  "name": "Phoenix",
+  "type": "fire",
+  "description": "A firebird bloodline",
+  "passiveAbility": "flame_aura",
+  "activeAbilities": ["rebirth", "fire_blast"],
+  "evolution": "ImmortalPhoenix",
+  "weakness": "water"
+}
+```
+
+### POST /content/dominions
+Create a custom dominion.
+
+**Request:**
+```json
+{
+  "name": "Inferno",
+  "type": "fire",
+  "abilities": ["massive_fireball", "lava_walk", "fire_immunity"],
+  "passiveBuffs": ["fire_damage_boost"],
+  "powerLevel": 8,
+  "cooldown": 30
+}
+```
+
+### POST /content/items
+Create a custom item.
+
+**Request:**
+```json
+{
+  "name": "Blade of Eternity",
+  "type": "sword",
+  "rarity": "legendary",
+  "damage": 15,
+  "specialAbility": "time_slash",
+  "attributeModifiers": {
+    "strength": 5,
+    "speed": 3
   }
-]
+}
 ```
 
 ---
 
-## Sync
+## World Event Endpoints
 
-### Pull All Data from Web
-```http
-GET /sync/all
+### GET /events
+Fetch current and past world events.
+
+### POST /events/trigger
+Manually trigger a world event.
+
+**Request:**
+```json
+{
+  "type": "demon_invasion" | "titan_awakening" | "divine_war" | "blood_moon" | "reality_collapse"
+}
 ```
 
-This endpoint allows servers to sync all data from the web dashboard.
-
-### Sync Player Data
-```http
-POST /sync/player/{uuid}
+**Response:**
+```json
+{
+  "success": true,
+  "event": "Demon Invasion",
+  "duration": 1200,
+  "affectedPlayers": 42
+}
 ```
 
-### Sync Faction Data
-```http
-POST /sync/faction/{factionId}
+### GET /events/{eventType}
+Fetch event history.
+
+---
+
+## Dimension Endpoints
+
+### GET /dimensions
+Fetch all dimensions.
+
+**Response:**
+```json
+{
+  "dimensions": [
+    {
+      "id": "divine_realm",
+      "name": "Divine Realm",
+      "description": "For gods and ascended beings",
+      "requiredLevel": 50,
+      "difficulty": "hard",
+      "playerCount": 5
+    }
+  ]
+}
+```
+
+### PUT /dimensions/{id}
+Update dimension settings.
+
+---
+
+## Achievement Endpoints
+
+### GET /achievements
+Fetch all achievements.
+
+### GET /players/{uuid}/achievements
+Fetch player's unlocked achievements.
+
+### POST /players/{uuid}/achievements/{achievementId}
+Unlock an achievement for a player.
+
+---
+
+## Leaderboard Endpoints
+
+### GET /leaderboards/level
+Fetch level leaderboard.
+
+**Query Parameters:**
+- `limit`: 50
+- `offset`: 0
+
+**Response:**
+```json
+{
+  "leaderboard": [
+    {
+      "rank": 1,
+      "player": "Player123",
+      "level": 99,
+      "bloodline": "Genesis",
+      "points": 5000
+    }
+  ]
+}
+```
+
+### GET /leaderboards/faith
+Fetch faith/religion leaderboard.
+
+### GET /leaderboards/wealth
+Fetch wealth leaderboard.
+
+### GET /leaderboards/gods
+Fetch god tier leaderboard.
+
+---
+
+## Settings Endpoints
+
+### GET /settings
+Fetch server settings.
+
+### POST /settings
+Update server settings.
+
+**Request:**
+```json
+{
+  "serverName": "DominionCore PvP",
+  "maxPlayers": 100,
+  "enableWebSync": true,
+  "syncInterval": 300,
+  "eventFrequency": "normal"
+}
 ```
 
 ---
 
-## Error Handling
+## Sync Endpoints
+
+### GET /sync/all
+Pull all data from server (admin only).
+
+### POST /sync/all
+Push all data to server (admin only).
+
+### GET /sync/status
+Check sync status.
+
+---
+
+## Error Responses
 
 All errors return appropriate HTTP status codes:
 
-- `200 OK` - Success
-- `400 Bad Request` - Invalid parameters
-- `401 Unauthorized` - Invalid/missing token
-- `403 Forbidden` - Insufficient permissions
-- `404 Not Found` - Resource not found
-- `500 Internal Server Error` - Server error
-
-**Error Response:**
 ```json
 {
-  "error": true,
-  "message": "Player not found",
-  "code": 404
+  "error": "Error message",
+  "code": "ERROR_CODE",
+  "timestamp": "2026-06-14T20:30:00Z"
 }
 ```
+
+### Common Status Codes
+- `200` - OK
+- `201` - Created
+- `400` - Bad Request
+- `401` - Unauthorized
+- `403` - Forbidden
+- `404` - Not Found
+- `500` - Internal Server Error
 
 ---
 
 ## Rate Limiting
 
-All endpoints are rate limited to:
-- 100 requests per minute for read operations
-- 50 requests per minute for write operations
+API requests are rate limited to 100 requests per minute per token.
 
-Rate limit info is returned in headers:
+Headers in response:
 ```
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 95
-X-RateLimit-Reset: 1623692400
+X-RateLimit-Reset: 1623710400
 ```
 
 ---
 
-## Webhooks
+## Pagination
 
-You can register webhooks to receive events from the server:
+List endpoints support pagination:
 
-### Register Webhook
-```http
-POST /webhooks
+**Query Parameters:**
+- `limit`: items per page (default 10, max 100)
+- `offset`: starting position (default 0)
+
+**Response Headers:**
 ```
-
-**Request Body:**
-```json
-{
-  "url": "https://your-server.com/webhook",
-  "events": ["player_join", "player_leave", "event_triggered"],
-  "secret": "your-secret-key"
-}
-```
-
-### Webhook Events
-- `player_join` - Player joins server
-- `player_leave` - Player leaves server
-- `player_levelup` - Player levels up
-- `faction_created` - Faction created
-- `religion_created` - Religion created
-- `event_triggered` - World event triggered
-- `dungeon_completed` - Dungeon completed
-
-**Webhook Payload:**
-```json
-{
-  "event": "player_join",
-  "timestamp": "2026-06-14T20:45:00Z",
-  "data": {
-    "uuid": "550e8400-e29b-41d4-a716-446655440000",
-    "name": "PlayerName"
-  }
-}
-```
-
----
-
-## Example Requests
-
-### Create a Legendary Sword
-```bash
-curl -X POST https://dominion-core.godkiller1233.dev/api/items \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Blade of Eternity",
-    "type": "sword",
-    "rarity": "mythic",
-    "damage": 25,
-    "attributes": {
-      "strength": 10,
-      "speed": 5
-    },
-    "specialAbilities": ["time_slash", "eternity_cut"]
-  }'
-```
-
-### Trigger Demon Invasion
-```bash
-curl -X POST https://dominion-core.godkiller1233.dev/api/events/trigger/demon_invasion \
-  -H "Authorization: Bearer YOUR_TOKEN"
-```
-
-### Get Player Leaderboard
-```bash
-curl -X GET https://dominion-core.godkiller1233.dev/api/leaderboard/level \
-  -H "Authorization: Bearer YOUR_TOKEN"
-```
-
----
-
-## SDK Examples
-
-### JavaScript
-```javascript
-const api = new DominionAPI('https://dominion-core.godkiller1233.dev/api', TOKEN);
-const players = await api.getPlayers();
-```
-
-### Python
-```python
-import requests
-
-headers = {'Authorization': f'Bearer {TOKEN}'}
-response = requests.get('https://dominion-core.godkiller1233.dev/api/players', headers=headers)
-players = response.json()
-```
-
-### Java
-```java
-HttpClient client = HttpClient.newHttpClient();
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://dominion-core.godkiller1233.dev/api/players"))
-    .header("Authorization", "Bearer " + token)
-    .GET()
-    .build();
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+X-Total-Count: 256
+X-Page-Count: 26
+X-Current-Page: 1
 ```

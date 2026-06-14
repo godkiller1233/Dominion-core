@@ -1,423 +1,344 @@
-// Dashboard Script
-let currentPage = 'dashboard';
-let playerGrowthChart, bloodlineChart;
+const API_BASE = 'https://dominion-core.godkiller1233.dev/api';
+let authToken = localStorage.getItem('authToken') || '';
 
-// Initialize Dashboard
-document.addEventListener('DOMContentLoaded', function() {
-    loadDashboard();
-    setupEventListeners();
+// Page Navigation
+document.querySelectorAll('.menu-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+        e.preventDefault();
+        const page = this.getAttribute('data-page');
+        switchPage(page);
+    });
 });
 
-function setupEventListeners() {
-    // Navigation
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const page = this.dataset.page;
-            navigateTo(page);
-        });
-    });
-}
-
-function navigateTo(page) {
+function switchPage(page) {
     // Hide all pages
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('active');
+    });
+
+    // Remove active from menu items
+    document.querySelectorAll('.menu-item').forEach(m => {
+        m.classList.remove('active');
+    });
 
     // Show selected page
-    const pageElement = document.getElementById(`${page}-page`);
+    const pageElement = document.getElementById('page-' + page);
     if (pageElement) {
         pageElement.classList.add('active');
-        document.querySelector(`[data-page="${page}"]`).classList.add('active');
-        document.getElementById('page-title').textContent = 
-            page.charAt(0).toUpperCase() + page.slice(1).replace(/[-_]/g, ' ');
-        currentPage = page;
+    }
 
-        // Load page data
-        loadPageData(page);
+    // Mark menu item as active
+    document.querySelector(`[data-page="${page}"]`).classList.add('active');
+
+    // Update page title
+    document.getElementById('page-title').textContent = 
+        document.querySelector(`[data-page="${page}"]`).textContent;
+
+    // Load page data
+    loadPageData(page);
+}
+
+function loadPageData(page) {
+    switch(page) {
+        case 'dashboard':
+            loadDashboard();
+            break;
+        case 'players':
+            loadPlayers();
+            break;
+        case 'factions':
+            loadFactions();
+            break;
+        case 'religions':
+            loadReligions();
+            break;
+        case 'events':
+            // Events page is static
+            break;
     }
 }
 
-async function loadPageData(page) {
-    try {
-        switch(page) {
-            case 'dashboard':
-                await loadDashboard();
-                break;
-            case 'players':
-                await loadPlayers();
-                break;
-            case 'factions':
-                await loadFactions();
-                break;
-            case 'religions':
-                await loadReligions();
-                break;
-            case 'bloodlines':
-                await loadBloodlines();
-                break;
-            case 'dominions':
-                await loadDominions();
-                break;
-            case 'items':
-                await loadItems();
-                break;
-            case 'dungeons':
-                await loadDungeons();
-                break;
-            case 'leaderboard':
-                await loadLeaderboard('level');
-                break;
-        }
-    } catch (error) {
-        console.error('Error loading page:', error);
-    }
-}
-
+// Load Dashboard
 async function loadDashboard() {
     try {
-        const stats = await api.getServerStats();
-        const data = stats.data;
+        const response = await axios.get(`${API_BASE}/dashboard`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
 
-        // Update stat cards
-        document.getElementById('online-players').textContent = data.onlinePlayers || 0;
-        document.getElementById('total-players').textContent = data.totalPlayers || 0;
-        document.getElementById('active-factions').textContent = data.activeFactions || 0;
-        document.getElementById('active-religions').textContent = data.activeReligions || 0;
+        const data = response.data;
 
-        // Create charts
-        createPlayerGrowthChart(data.playerGrowthData || []);
-        createBloodlineChart(data.bloodlineDistribution || {});
+        // Update stats
+        document.getElementById('online-players').textContent = data.onlinePlayers;
+        document.getElementById('total-factions').textContent = data.totalFactions;
+        document.getElementById('total-religions').textContent = data.totalReligions;
+        document.getElementById('total-gods').textContent = data.totalGods;
 
-        // Load activity
-        displayActivity(data.recentActivity || []);
+        // Update charts
+        createProgressionChart(data.progressionData);
+        createDominionsChart(data.dominionsData);
+
+        // Update activity
+        loadActivity(data.recentActivity);
     } catch (error) {
-        console.error('Error loading dashboard:', error);
+        console.error('Failed to load dashboard:', error);
     }
 }
 
+function createProgressionChart(data) {
+    const ctx = document.getElementById('progression-chart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: 'Progression Level',
+                    data: data.values,
+                    borderColor: '#FF6B35',
+                    backgroundColor: 'rgba(255, 107, 53, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#e0e0e0'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            color: '#b0b0b0'
+                        },
+                        grid: {
+                            color: 'rgba(255, 107, 53, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#b0b0b0'
+                        },
+                        grid: {
+                            color: 'rgba(255, 107, 53, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+function createDominionsChart(data) {
+    const ctx = document.getElementById('dominions-chart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    data: data.values,
+                    backgroundColor: [
+                        '#FF6B35', '#004E89', '#00d084', '#ffd700',
+                        '#0084ff', '#ff4444', '#9c27b0'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#e0e0e0'
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+function loadActivity(activities) {
+    const list = document.getElementById('activity-list');
+    if (!list) return;
+
+    list.innerHTML = activities.map(activity => `
+        <div class="activity-item">
+            <strong>${activity.player}</strong> ${activity.action}
+            <div class="activity-time">${new Date(activity.timestamp).toLocaleString()}</div>
+        </div>
+    `).join('');
+}
+
+// Load Players
 async function loadPlayers() {
     try {
-        const response = await api.getPlayers();
-        const players = response.data;
-        const tbody = document.getElementById('players-tbody');
-        tbody.innerHTML = '';
+        const response = await axios.get(`${API_BASE}/players`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
 
-        players.forEach(player => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
+        const tbody = document.getElementById('players-table-body');
+        tbody.innerHTML = response.data.players.map(player => `
+            <tr>
                 <td>${player.name}</td>
-                <td>${player.level}</td>
                 <td>${player.bloodline || 'None'}</td>
                 <td>${player.dominion || 'None'}</td>
-                <td>${player.religion || 'None'}</td>
-                <td><span class="status-badge ${player.online ? 'online' : 'offline'}">${player.online ? 'Online' : 'Offline'}</span></td>
+                <td>${player.level}</td>
+                <td>${player.faction || 'None'}</td>
+                <td><span class="status-badge status-${player.status}">${player.status}</span></td>
                 <td>
                     <button class="btn btn-primary" onclick="editPlayer('${player.uuid}')">Edit</button>
-                    <button class="btn btn-warning" onclick="kickPlayer('${player.uuid}')">Kick</button>
+                    <button class="btn btn-danger" onclick="deletePlayer('${player.uuid}')">Delete</button>
                 </td>
-            `;
-            tbody.appendChild(row);
-        });
+            </tr>
+        `).join('');
     } catch (error) {
-        console.error('Error loading players:', error);
+        console.error('Failed to load players:', error);
     }
 }
 
+// Load Factions
 async function loadFactions() {
     try {
-        const response = await api.getFactions();
-        const factions = response.data;
-        const grid = document.getElementById('factions-grid');
-        grid.innerHTML = '';
-
-        factions.forEach(faction => {
-            const card = document.createElement('div');
-            card.className = 'grid-card';
-            card.innerHTML = `
-                <h4>${faction.name}</h4>
-                <p>King: ${faction.king}</p>
-                <p>Members: ${faction.memberCount || 0}</p>
-                <p>Treasury: ${faction.treasury || 0} coins</p>
-                <div style="margin-top: 10px;">
-                    <button class="btn btn-primary" onclick="editFaction('${faction.id}')">Edit</button>
-                    <button class="btn btn-warning" onclick="deleteFaction('${faction.id}')">Delete</button>
-                </div>
-            `;
-            grid.appendChild(card);
+        const response = await axios.get(`${API_BASE}/factions`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
         });
+
+        const grid = document.getElementById('factions-grid');
+        grid.innerHTML = response.data.factions.map(faction => `
+            <div class="faction-card">
+                <h3>${faction.name}</h3>
+                <p>👑 King: ${faction.king}</p>
+                <p>👥 Members: ${faction.memberCount}</p>
+                <p>💰 Treasury: ${faction.treasury}</p>
+                <button class="btn btn-primary" onclick="editFaction('${faction.id}')">Edit</button>
+            </div>
+        `).join('');
     } catch (error) {
-        console.error('Error loading factions:', error);
+        console.error('Failed to load factions:', error);
     }
 }
 
+// Load Religions
 async function loadReligions() {
     try {
-        const response = await api.getReligions();
-        const religions = response.data;
+        const response = await axios.get(`${API_BASE}/religions`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
         const grid = document.getElementById('religions-grid');
-        grid.innerHTML = '';
-
-        religions.forEach(religion => {
-            const card = document.createElement('div');
-            card.className = 'grid-card';
-            card.innerHTML = `
-                <h4>${religion.name}</h4>
-                <p>Founder: ${religion.founder}</p>
-                <p>Followers: ${religion.followerCount || 0}</p>
-                <p>Faith: ${religion.faith || 0}</p>
-                <div style="margin-top: 10px;">
-                    <button class="btn btn-primary" onclick="editReligion('${religion.id}')">Edit</button>
-                    <button class="btn btn-warning" onclick="deleteReligion('${religion.id}')">Delete</button>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
+        grid.innerHTML = response.data.religions.map(religion => `
+            <div class="religion-card">
+                <h3>${religion.name}</h3>
+                <p>⛪ Founder: ${religion.founder}</p>
+                <p>👥 Followers: ${religion.followerCount}</p>
+                <p>✨ Faith: ${religion.faith}</p>
+                <button class="btn btn-primary" onclick="editReligion('${religion.id}')">Edit</button>
+            </div>
+        `).join('');
     } catch (error) {
-        console.error('Error loading religions:', error);
+        console.error('Failed to load religions:', error);
     }
 }
 
-async function loadBloodlines() {
-    try {
-        const response = await api.getBloodlines();
-        const bloodlines = response.data;
-        const grid = document.getElementById('bloodlines-grid');
-        grid.innerHTML = '';
-
-        bloodlines.forEach(bloodline => {
-            const card = document.createElement('div');
-            card.className = 'grid-card';
-            card.innerHTML = `
-                <h4>${bloodline.name}</h4>
-                <p>Type: ${bloodline.type || 'Basic'}</p>
-                <p>Users: ${bloodline.userCount || 0}</p>
-                <div style="margin-top: 10px;">
-                    <button class="btn btn-primary" onclick="editBloodline('${bloodline.id}')">Edit</button>
-                    <button class="btn btn-warning" onclick="deleteBloodline('${bloodline.id}')">Delete</button>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-    } catch (error) {
-        console.error('Error loading bloodlines:', error);
-    }
+// Modal Functions
+function openPlayerModal() {
+    document.getElementById('player-modal').classList.add('show');
 }
 
-async function loadDominions() {
-    try {
-        const response = await api.getDominions();
-        const dominions = response.data;
-        const grid = document.getElementById('dominions-grid');
-        grid.innerHTML = '';
-
-        dominions.forEach(dominion => {
-            const card = document.createElement('div');
-            card.className = 'grid-card';
-            card.innerHTML = `
-                <h4>${dominion.name}</h4>
-                <p>Type: ${dominion.type || 'Basic'}</p>
-                <p>Power: ${dominion.power || 1}</p>
-                <div style="margin-top: 10px;">
-                    <button class="btn btn-primary" onclick="editDominion('${dominion.id}')">Edit</button>
-                    <button class="btn btn-warning" onclick="deleteDominion('${dominion.id}')">Delete</button>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-    } catch (error) {
-        console.error('Error loading dominions:', error);
-    }
+function openFactionModal() {
+    document.getElementById('faction-modal').classList.add('show');
 }
 
-async function loadItems() {
-    try {
-        const response = await api.getItems();
-        const items = response.data;
-        const grid = document.getElementById('items-grid');
-        grid.innerHTML = '';
-
-        items.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'grid-card';
-            card.innerHTML = `
-                <h4>${item.name}</h4>
-                <p>Rarity: ${item.rarity || 'Common'}</p>
-                <p>Damage: +${item.damage || 0}</p>
-                <div style="margin-top: 10px;">
-                    <button class="btn btn-primary" onclick="editItem('${item.id}')">Edit</button>
-                    <button class="btn btn-warning" onclick="deleteItem('${item.id}')">Delete</button>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-    } catch (error) {
-        console.error('Error loading items:', error);
-    }
+function openReligionModal() {
+    document.getElementById('religion-modal').classList.add('show');
 }
 
-async function loadDungeons() {
-    try {
-        const response = await api.getDungeons();
-        const dungeons = response.data;
-        const grid = document.getElementById('dungeons-grid');
-        grid.innerHTML = '';
-
-        dungeons.forEach(dungeon => {
-            const card = document.createElement('div');
-            card.className = 'grid-card';
-            card.innerHTML = `
-                <h4>${dungeon.name}</h4>
-                <p>Difficulty: ${dungeon.difficulty || 'Normal'}</p>
-                <p>Max Players: ${dungeon.maxPlayers || 4}</p>
-                <p>Resets: ${dungeon.resetTime || 'Daily'}</p>
-                <div style="margin-top: 10px;">
-                    <button class="btn btn-primary" onclick="editDungeon('${dungeon.id}')">Edit</button>
-                    <button class="btn btn-warning" onclick="deleteDungeon('${dungeon.id}')">Delete</button>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-    } catch (error) {
-        console.error('Error loading dungeons:', error);
-    }
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('show');
 }
 
-async function loadLeaderboard(type) {
-    try {
-        const response = await api.getLeaderboard(type);
-        const leaderboard = response.data;
-        const container = document.getElementById('leaderboard-content');
-        container.innerHTML = '';
-
-        leaderboard.forEach((entry, index) => {
-            const item = document.createElement('div');
-            item.className = 'leaderboard-item';
-            item.innerHTML = `
-                <div class="leaderboard-rank">#${index + 1}</div>
-                <div class="leaderboard-info">
-                    <img src="https://crafatar.com/avatars/${entry.uuid}?size=32" alt="${entry.name}" class="avatar" style="border-radius: 50%; width: 32px; height: 32px;">
-                    <span class="leaderboard-name">${entry.name}</span>
-                </div>
-                <div class="leaderboard-score">${entry.score || 0}</div>
-            `;
-            container.appendChild(item);
-        });
-    } catch (error) {
-        console.error('Error loading leaderboard:', error);
-    }
-}
-
-function createPlayerGrowthChart(data) {
-    const ctx = document.getElementById('playerGrowthChart');
-    if (playerGrowthChart) playerGrowthChart.destroy();
-    playerGrowthChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data.map(d => d.date) || [],
-            datasets: [{
-                label: 'Players',
-                data: data.map(d => d.count) || [],
-                borderColor: '#ff6b35',
-                backgroundColor: 'rgba(255, 107, 53, 0.1)',
-                borderWidth: 2,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    labels: { color: '#e0e0e0' }
-                }
-            },
-            scales: {
-                y: {
-                    ticks: { color: '#e0e0e0' },
-                    grid: { color: '#333' }
-                },
-                x: {
-                    ticks: { color: '#e0e0e0' },
-                    grid: { color: '#333' }
-                }
-            }
-        }
-    });
-}
-
-function createBloodlineChart(data) {
-    const ctx = document.getElementById('bloodlineChart');
-    if (bloodlineChart) bloodlineChart.destroy();
-    bloodlineChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(data),
-            datasets: [{
-                data: Object.values(data),
-                backgroundColor: [
-                    '#ff6b35',
-                    '#4ecdc4',
-                    '#ff9f43',
-                    '#a29bfe',
-                    '#74b9ff',
-                    '#81ecec'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    labels: { color: '#e0e0e0' }
-                }
-            }
-        }
-    });
-}
-
-function displayActivity(activities) {
-    const list = document.getElementById('activity-list');
-    list.innerHTML = '';
-    
-    activities.forEach(activity => {
-        const item = document.createElement('div');
-        item.className = 'activity-item';
-        item.style.cssText = 'padding: 10px; border-bottom: 1px solid #333; color: #e0e0e0;';
-        item.innerHTML = `
-            <p>${activity.message}</p>
-            <small style="color: #888;">${new Date(activity.timestamp).toLocaleString()}</small>
-        `;
-        list.appendChild(item);
-    });
-}
-
-async function triggerEvent(eventType) {
-    try {
-        await api.triggerEvent(eventType);
-        alert(`Event triggered: ${eventType}`);
-    } catch (error) {
-        console.error('Error triggering event:', error);
-        alert('Failed to trigger event');
-    }
-}
-
-function saveSettings() {
-    alert('Settings saved!');
-}
-
-function closeModal() {
-    document.getElementById('modal').style.display = 'none';
-}
-
-function submitForm(event) {
-    event.preventDefault();
-    alert('Form submitted!');
-    closeModal();
-}
-
+// Close modal when clicking outside
 window.onclick = function(event) {
-    const modal = document.getElementById('modal');
-    if (event.target === modal) {
-        modal.style.display = 'none';
+    if (event.target.classList.contains('modal')) {
+        event.target.classList.remove('show');
     }
 }
+
+// Form Submissions
+document.getElementById('player-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+        await axios.post(`${API_BASE}/players`, {
+            name: document.getElementById('modal-player-name').value,
+            bloodline: document.getElementById('modal-bloodline').value,
+            dominion: document.getElementById('modal-dominion').value,
+            level: document.getElementById('modal-level').value
+        }, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        closeModal('player-modal');
+        loadPlayers();
+    } catch (error) {
+        alert('Error creating player: ' + error.message);
+    }
+});
+
+document.getElementById('faction-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+        await axios.post(`${API_BASE}/factions`, {
+            name: document.getElementById('modal-faction-name').value,
+            king: document.getElementById('modal-faction-king').value,
+            treasury: document.getElementById('modal-treasury').value
+        }, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        closeModal('faction-modal');
+        loadFactions();
+    } catch (error) {
+        alert('Error creating faction: ' + error.message);
+    }
+});
+
+// Trigger World Event
+async function triggerEvent(eventType) {
+    if (!confirm(`Trigger ${eventType}? This will affect all players.`)) return;
+
+    try {
+        await axios.post(`${API_BASE}/events/trigger`, {
+            type: eventType
+        }, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        alert('Event triggered successfully!');
+    } catch (error) {
+        alert('Error triggering event: ' + error.message);
+    }
+}
+
+// Save Settings
+async function saveSettings() {
+    try {
+        await axios.post(`${API_BASE}/settings`, {
+            serverName: document.getElementById('server-name').value,
+            maxPlayers: document.getElementById('max-players').value,
+            enableSync: document.getElementById('enable-sync').checked,
+            syncInterval: document.getElementById('sync-interval').value,
+            eventFrequency: document.getElementById('event-frequency').value
+        }, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        alert('Settings saved successfully!');
+    } catch (error) {
+        alert('Error saving settings: ' + error.message);
+    }
+}
+
+// Initialize
+window.addEventListener('load', () => {
+    loadDashboard();
+});
