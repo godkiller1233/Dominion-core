@@ -1,0 +1,26 @@
+# Example DominionCore Script File
+# This demonstrates how to create custom content
+
+# Define a custom bloodline
+bloodline Phoenix {
+  type: fire
+  passive: flame_aura
+  active: [rebirth, fire_blast]
+  evolution: ImmortalPhoenix
+  weakness: water
+}
+
+# Define a custom dominion
+dominion Inferno {
+  type: fire
+  ability: [massive_fireball, lava_walk, fire_immunity]
+  passive: fire_damage_boost
+  cooldown: 30
+}
+
+# Define a custom religion
+religion PyreWorship {
+  symbol: flame
+  beliefs: [rebirth, transformation, eternity]
+  divine_ability: eternal_flame
+}

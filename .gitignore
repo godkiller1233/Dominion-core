@@ -1,0 +1,33 @@
+# Gradle
+.gradle/
+build/
+bin/
+out/
+*.jar
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Minecraft
+run/
+runs/
+
+# Generated
+src/generated/
+
+# Scripts
+dominion/scripts/
+dominion/custom/
+dominion/data/
+
+# Dependencies
+*.class
+*.log

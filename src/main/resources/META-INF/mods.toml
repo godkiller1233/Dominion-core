@@ -1,0 +1,27 @@
+modLoader="javafxmod"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="dominion"
+version="1.0.0"
+displayName="DominionCore"
+displayURL="https://github.com/godkiller1233/Dominion-core"
+logoFile="dominion_logo.png"
+credits="Created by godkiller1233"
+authors="godkiller1233"
+description="""A fully expandable Minecraft RPG mod with custom .dc file system for creating bloodlines, dominions, religions, and more."""
+
+[[dependencies.dominion]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1]"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.dominion]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47.4.10,]"
+    ordering="NONE"
+    side="BOTH"
